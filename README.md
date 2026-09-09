@@ -283,15 +283,15 @@ with `RequestOptions(disable_retry=True)`.
 
 Runnable examples live under [`examples/`](examples/):
 
-- [Hello world](examples/hello_world.py)
+- [Hello world](examples/hello_world/README.md)
 - [HTTP execution server](examples/execution_server/README.md)
-- [Command streaming](examples/command_streaming.py)
-- [Files and snapshots](examples/files_and_snapshots.py)
-- [Ingress preview](examples/ingress_preview.py)
-- [Private overlay network](examples/network.py)
-- [Custom template](examples/custom_template.py)
-- [Managed process lifecycle](examples/managed_process.py)
-- [Desktop and noVNC](examples/desktop.py)
+- [Command streaming](examples/command_streaming/README.md)
+- [Files and snapshots](examples/files_and_snapshots/README.md)
+- [Ingress preview](examples/ingress_preview/README.md)
+- [Private overlay network](examples/network/README.md)
+- [Custom template](examples/custom_template/README.md)
+- [Managed process lifecycle](examples/managed_process/README.md)
+- [Desktop and noVNC](examples/desktop/README.md)
 
 Together these examples cover command execution, file transfer, streaming,
 ingress, snapshots, networking, templates, managed processes, and desktop use.
