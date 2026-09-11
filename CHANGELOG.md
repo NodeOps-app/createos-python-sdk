@@ -16,6 +16,16 @@ Versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.1.1] — 2026-09-11
+
+### Added
+
+- Optional per-operation timeouts for file uploads and downloads.
+
+### Fixed
+
+- Repository-only artwork is excluded from source distributions.
+
 ## [0.1.0] — 2026-09-11
 
 Initial release.
@@ -25,5 +35,6 @@ Initial release.
   managed processes, networks, ingress previews, and custom templates.
 - Typed wire-contract models, typed errors, and `py.typed`.
 
-[Unreleased]: https://github.com/NodeOps-app/createos-python-sdk/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/NodeOps-app/createos-python-sdk/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/NodeOps-app/createos-python-sdk/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/NodeOps-app/createos-python-sdk/releases/tag/v0.1.0
