@@ -7,8 +7,9 @@ its output, destroys the sandbox, and returns JSON.
 Run the server from the repository root:
 
 ```sh
+python -m pip install createos-sandbox
 export CREATEOS_SANDBOX_API_KEY="your-api-key"
-.venv/bin/python examples/execution_server/main.py
+python examples/execution_server/main.py
 ```
 
 It listens on `127.0.0.1:8080` by default. Send a command without shell

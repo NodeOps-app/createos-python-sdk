@@ -3,7 +3,7 @@ requires = ["hatchling>=1.21"]
 build-backend = "hatchling.build"
 
 [project]
-name = "createos"
+name = "createos-sandbox"
 version = "0.1.0"
 description = "Python SDK for CreateOS cloud sandboxes"
 readme = "README.md"

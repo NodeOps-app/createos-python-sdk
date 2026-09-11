@@ -4,8 +4,9 @@ Start an HTTP server inside a sandbox, obtain its public preview URL, and fetch
 the uploaded page through ingress.
 
 ```sh
+python -m pip install createos-sandbox
 export CREATEOS_SANDBOX_API_KEY="your-api-key"
-.venv/bin/python examples/ingress_preview/main.py
+python examples/ingress_preview/main.py
 ```
 
 The example disables TLS verification only for the preview request because the

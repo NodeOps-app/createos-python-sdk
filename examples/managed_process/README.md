@@ -4,8 +4,9 @@ Exercise persistent pipe and PTY processes, including input, output replay,
 terminal resize, waiting, and process-tree termination.
 
 ```sh
+python -m pip install createos-sandbox
 export CREATEOS_SANDBOX_API_KEY="your-api-key"
-.venv/bin/python examples/managed_process/main.py
+python examples/managed_process/main.py
 ```
 
 The example verifies environment overrides, standard output and error,
