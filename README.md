@@ -6,7 +6,7 @@ open a preview URL, and tear everything down from Python.
 ## Your first sandbox
 
 ```sh
-pip install createos
+pip install createos-sandbox
 ```
 
 Python 3.10 or newer is required.
