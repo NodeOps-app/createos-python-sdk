@@ -60,15 +60,17 @@ As an alternative, `Client()` reads `CREATEOS_SANDBOX_API_KEY` and
 
 ## Documentation
 
-- [CreateOS Sandbox overview](https://nodeops.network/createos/docs/Sandbox/Overview)
+- [CreateOS Sandbox overview](https://createos.sh/docs/Sandbox/Overview)
   explains the sandbox model, lifecycle, networking, storage, and isolation.
-- [CreateOS Sandbox documentation](https://nodeops.network/createos/docs)
-  contains the REST API reference and product guides.
+- [CreateOS Sandbox documentation](https://createos.sh/docs) contains the REST
+  API reference and product guides.
 - [CreateOS Go SDK](https://github.com/NodeOps-app/createos-go-sdk) provides the
   same sandbox capabilities for Go applications.
 - [CreateOS TypeScript SDK](https://github.com/NodeOps-app/createos-sandbox-sdk)
   provides the same sandbox capabilities for JavaScript and TypeScript
   applications.
+- [`CLAUDE.md`](CLAUDE.md) is the agent guide: repository conventions, the map
+  of sibling SDKs and their agent guides, and the cross-SDK parity protocol.
 - [Runnable examples](#examples) demonstrate complete SDK workflows.
 - The public Python API is typed and documented with Python docstrings.
 - [Contributing guide](CONTRIBUTING.md) documents development checks and commit
