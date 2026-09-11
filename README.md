@@ -120,6 +120,31 @@ with sandbox.files.download("/workspace/config.json") as download:
 `upload()` also accepts a binary file-like object, allowing large files to be
 transferred without reading them all into memory first.
 
+For large transfers, override the timeout for that operation without changing
+the client's default timeout:
+
+```python
+from createos import RequestOptions
+
+
+transfer_options = RequestOptions(timeout=30 * 60)
+sandbox.files.upload(
+    "/workspace/archive.tar",
+    source,
+    options=transfer_options,
+)
+with sandbox.files.download(
+    "/workspace/archive.tar",
+    options=transfer_options,
+) as download:
+    consume(download)
+```
+
+The timeout applies to connection-pool waits and to each connect, read, and write
+operation. For downloads, the configured read timeout remains active until the
+body reaches EOF or the stream is closed. Uploads are not retried because an
+arbitrary file-like object may not be safe to replay after a partial write.
+
 ## Keep a process alive after disconnecting
 
 Managed processes are resources rather than fragile terminal sessions. Start

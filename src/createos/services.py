@@ -294,8 +294,13 @@ class FilesService:
     def __init__(self, instance: SandboxInstance) -> None:
         self._instance = instance
 
-    def upload(self, path: str, data: bytes | bytearray | Any) -> None:
-        """Write binary data to an absolute sandbox path."""
+    def upload(
+        self,
+        path: str,
+        data: bytes | bytearray | Any,
+        options: RequestOptions | None = None,
+    ) -> None:
+        """Write binary data with optional per-operation network timeouts."""
         body = bytes(data) if isinstance(data, (bytes, bytearray)) else data
         response = self._instance._transport.request_raw(
             "PUT",
@@ -303,6 +308,7 @@ class FilesService:
             params={"path": path},
             raw_body=body,
             content_type="application/octet-stream",
+            options=_request_options(options or RequestOptions()),
         )
         try:
             self._instance._transport._raise_for_status(
@@ -311,11 +317,18 @@ class FilesService:
         finally:
             response.close()
 
-    def download(self, path: str) -> BinaryStream:
-        """Open a sandbox file as a context-managed binary stream."""
+    def download(
+        self,
+        path: str,
+        options: RequestOptions | None = None,
+    ) -> BinaryStream:
+        """Open a file stream with optional per-operation network timeouts."""
         endpoint = self._instance._path("/files")
         response = self._instance._transport.stream(
-            "GET", endpoint, params={"path": path}
+            "GET",
+            endpoint,
+            params={"path": path},
+            options=_request_options(options or RequestOptions()),
         )
         return BinaryStream(response)
 

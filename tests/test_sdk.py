@@ -14,6 +14,7 @@ from createos import (
     ForkSandboxRequest,
     ManagedProcessConnectEvent,
     ProtocolError,
+    RequestOptions,
     RunCommandRequest,
     SandboxStatus,
 )
@@ -233,3 +234,38 @@ def test_command_stream_projects_frames_and_accepts_sse():
         ExecStreamEventType.EXIT,
     ]
     assert events[-1].exit_code == 0
+
+
+def test_file_transfers_use_operation_timeout():
+    requests = []
+
+    def handler(request):
+        requests.append(request)
+        if request.url.path == "/v1/sandboxes/sb-1":
+            return envelope({"id": "sb-1", "status": "running"})
+        if request.method == "PUT":
+            assert request.content == b"contents"
+            return envelope({"bytes": 8, "path": "/workspace/file.txt"})
+        return httpx.Response(200, content=b"contents")
+
+    client = Client(
+        api_key="key",
+        base_url="https://example.test",
+        http_client=mock_client(handler),
+    )
+    sandbox = client.get_sandbox("sb-1")
+    sandbox.files.upload(
+        "/workspace/file.txt",
+        b"contents",
+        RequestOptions(timeout=300),
+    )
+    with sandbox.files.download(
+        "/workspace/file.txt",
+        RequestOptions(timeout=600),
+    ) as download:
+        assert download.read() == b"contents"
+
+    upload_timeout = requests[1].extensions["timeout"]
+    download_timeout = requests[2].extensions["timeout"]
+    assert set(upload_timeout.values()) == {300}
+    assert set(download_timeout.values()) == {600}
