@@ -69,8 +69,8 @@ As an alternative, `Client()` reads `CREATEOS_SANDBOX_API_KEY` and
 - [CreateOS TypeScript SDK](https://github.com/NodeOps-app/createos-sandbox-sdk)
   provides the same sandbox capabilities for JavaScript and TypeScript
   applications.
-- [`CLAUDE.md`](CLAUDE.md) is the agent guide: repository conventions, the map
-  of sibling SDKs and their agent guides, and the cross-SDK parity protocol.
+- [`CLAUDE.md`](CLAUDE.md) is the agent guide: repository conventions plus the
+  generated cross-repo mesh block.
 - [Runnable examples](#examples) demonstrate complete SDK workflows.
 - The public Python API is typed and documented with Python docstrings.
 - [Contributing guide](CONTRIBUTING.md) documents development checks and commit
