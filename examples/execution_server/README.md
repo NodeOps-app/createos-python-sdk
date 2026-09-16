@@ -8,7 +8,7 @@ Run the server from the repository root:
 
 ```sh
 python -m pip install createos-sandbox
-export CREATEOS_SANDBOX_API_KEY="your-api-key"
+export CREATEOS_API_KEY="your-api-key"
 python examples/execution_server/main.py
 ```
 

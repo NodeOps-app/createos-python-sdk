@@ -5,7 +5,7 @@ terminal resize, waiting, and process-tree termination.
 
 ```sh
 python -m pip install createos-sandbox
-export CREATEOS_SANDBOX_API_KEY="your-api-key"
+export CREATEOS_API_KEY="your-api-key"
 python examples/managed_process/main.py
 ```
 

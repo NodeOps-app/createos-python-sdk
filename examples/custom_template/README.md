@@ -5,7 +5,7 @@ Docker daemon, and run `hello-world` and Alpine containers.
 
 ```sh
 python -m pip install createos-sandbox
-export CREATEOS_SANDBOX_API_KEY="your-api-key"
+export CREATEOS_API_KEY="your-api-key"
 python examples/custom_template/main.py
 ```
 

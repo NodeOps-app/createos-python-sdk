@@ -58,7 +58,7 @@ class Client:
             api_key=(
                 api_key
                 if api_key is not None
-                else os.getenv("CREATEOS_SANDBOX_API_KEY", "")
+                else os.getenv("CREATEOS_API_KEY", "")
             ),
             timeout=timeout,
             user_agent=user_agent,

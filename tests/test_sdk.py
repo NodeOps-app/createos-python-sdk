@@ -7,6 +7,7 @@ import pytest
 
 from createos import (
     APIError,
+    AuthenticationError,
     Client,
     CommandStreamEvent,
     CreateSandboxRequest,
@@ -50,6 +51,29 @@ def test_health_omits_auth_and_whoami_sends_it():
     assert client.who_am_i().user_id == "user-1"
     assert "x-api-key" not in seen[0].headers
     assert seen[1].headers["x-api-key"] == "secret"
+
+
+def test_client_uses_createos_api_key_environment_variable(monkeypatch):
+    seen = []
+
+    def handler(request):
+        seen.append(request)
+        return envelope({"user_id": "user-1", "stats": {"total": 1}})
+
+    monkeypatch.setenv("CREATEOS_API_KEY", "new-key")
+    with Client(
+        base_url="https://example.test", http_client=mock_client(handler)
+    ) as client:
+        client.who_am_i()
+    assert seen[0].headers["x-api-key"] == "new-key"
+
+    monkeypatch.delenv("CREATEOS_API_KEY")
+    with Client(
+        base_url="https://example.test", http_client=mock_client(handler)
+    ) as client:
+        with pytest.raises(AuthenticationError):
+            client.who_am_i()
+    assert len(seen) == 1
 
 
 def test_create_initializes_state_services_and_clear_wire_fields():

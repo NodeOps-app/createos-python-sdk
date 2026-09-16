@@ -8,13 +8,21 @@ Versions follow [Semantic Versioning](https://semver.org/).
 
 - Anything re-exported from `src/createos/__init__.py` is part of the public
   API.
-- We are pre-1.0, so the API is allowed to break in MINOR bumps — breaking
-  changes ship as MINOR, and PATCH releases are bug-fix only.
+- We are pre-1.0, so the API is allowed to break in MINOR bumps. PATCH releases
+  normally contain bug fixes; 0.1.2 also changes the API key environment
+  variable.
 - Where possible, breaking changes are announced one minor before removal: the
   old surface keeps working, gains a `DeprecationWarning`, and this file points
   at the replacement.
 
 ## [Unreleased]
+
+## [0.1.2] — 2026-09-16
+
+### Changed
+
+- `Client()` now reads its default API key from `CREATEOS_API_KEY`. Update
+  environments that rely on the previous variable name.
 
 ## [0.1.1] — 2026-09-11
 
@@ -35,6 +43,7 @@ Initial release.
   managed processes, networks, ingress previews, and custom templates.
 - Typed wire-contract models, typed errors, and `py.typed`.
 
-[Unreleased]: https://github.com/NodeOps-app/createos-python-sdk/compare/v0.1.1...HEAD
+[Unreleased]: https://github.com/NodeOps-app/createos-python-sdk/compare/v0.1.2...HEAD
+[0.1.2]: https://github.com/NodeOps-app/createos-python-sdk/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/NodeOps-app/createos-python-sdk/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/NodeOps-app/createos-python-sdk/releases/tag/v0.1.0

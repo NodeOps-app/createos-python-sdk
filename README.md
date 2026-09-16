@@ -55,7 +55,7 @@ client = Client(
 )
 ```
 
-As an alternative, `Client()` reads `CREATEOS_SANDBOX_API_KEY` and
+As an alternative, `Client()` reads `CREATEOS_API_KEY` and
 `CREATEOS_SANDBOX_BASE_URL`. Explicit constructor arguments take precedence.
 
 ## Documentation
@@ -64,17 +64,20 @@ As an alternative, `Client()` reads `CREATEOS_SANDBOX_API_KEY` and
   explains the sandbox model, lifecycle, networking, storage, and isolation.
 - [CreateOS Sandbox documentation](https://createos.sh/docs) contains the REST
   API reference and product guides.
-- [CreateOS Go SDK](https://github.com/NodeOps-app/createos-go-sdk) provides the
-  same sandbox capabilities for Go applications.
-- [CreateOS TypeScript SDK](https://github.com/NodeOps-app/createos-sandbox-sdk)
-  provides the same sandbox capabilities for JavaScript and TypeScript
-  applications.
 - [`CLAUDE.md`](CLAUDE.md) is the agent guide: repository conventions plus the
   generated cross-repo mesh block.
 - [Runnable examples](#examples) demonstrate complete SDK workflows.
 - The public Python API is typed and documented with Python docstrings.
 - [Contributing guide](CONTRIBUTING.md) documents development checks and commit
   conventions.
+
+### SDKs
+
+- [TypeScript](https://github.com/NodeOps-app/createos-sandbox-sdk)
+- [Go](https://github.com/NodeOps-app/createos-go-sdk)
+- [C#](https://github.com/NodeOps-app/createos-csharp-sdk)
+- [Java](https://github.com/NodeOps-app/createos-java-sdk)
+- [Rust](https://github.com/NodeOps-app/createos-rust-sdk)
 
 ## Stream output as it happens
 

@@ -7,7 +7,7 @@ from createos import Client, CreateSandboxRequest, RunCommandRequest
 
 def main() -> None:
     """Create a sandbox, run one command, and clean it up."""
-    with Client(api_key=os.environ["CREATEOS_SANDBOX_API_KEY"]) as client:
+    with Client(api_key=os.environ["CREATEOS_API_KEY"]) as client:
         sandbox = client.create_sandbox(
             CreateSandboxRequest(
                 name="hello-python",

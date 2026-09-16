@@ -5,7 +5,7 @@ the network membership response.
 
 ```sh
 python -m pip install createos-sandbox
-export CREATEOS_SANDBOX_API_KEY="your-api-key"
+export CREATEOS_API_KEY="your-api-key"
 python examples/network/main.py
 ```
 

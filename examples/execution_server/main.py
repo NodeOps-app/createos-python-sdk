@@ -228,9 +228,9 @@ def _handler(
 
 def main() -> None:
     """Run the local execution server until interrupted."""
-    api_key = os.getenv("CREATEOS_SANDBOX_API_KEY", "").strip()
+    api_key = os.getenv("CREATEOS_API_KEY", "").strip()
     if not api_key:
-        raise SystemExit("CREATEOS_SANDBOX_API_KEY is required")
+        raise SystemExit("CREATEOS_API_KEY is required")
     address = os.getenv("EXECUTION_SERVER_ADDRESS", _DEFAULT_ADDRESS).strip()
     host, separator, port_text = address.rpartition(":")
     if not separator or not host:

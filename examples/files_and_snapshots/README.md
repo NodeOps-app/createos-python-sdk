@@ -5,7 +5,7 @@ filesystem while later writes remain isolated from the source.
 
 ```sh
 python -m pip install createos-sandbox
-export CREATEOS_SANDBOX_API_KEY="your-api-key"
+export CREATEOS_API_KEY="your-api-key"
 python examples/files_and_snapshots/main.py
 ```
 
