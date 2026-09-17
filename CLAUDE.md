@@ -32,6 +32,9 @@ the contributor guide does not.
 | **[fc-sdk](https://github.com/nodeops-app/fc-sdk)** | `../fc-sdk` | TypeScript SDK **+ `examples/`** | 🌐 public | public SDK methods, wire types, example apps |
 | **[createos-go-sdk](https://github.com/NodeOps-app/createos-go-sdk)** | `../createos-go-sdk` | Go SDK | 🌐 public | public SDK methods, wire types, examples |
 | **createos-python-sdk** ← you are here | this repo | Python SDK | 🌐 public | public SDK methods, wire types, examples |
+| **[createos-csharp-sdk](https://github.com/NodeOps-app/createos-csharp-sdk)** | `../createos-csharp-sdk` | C# SDK | 🌐 public | public SDK methods, wire types, examples |
+| **[createos-java-sdk](https://github.com/NodeOps-app/createos-java-sdk)** | `../createos-java-sdk` | Java SDK | 🌐 public | public SDK methods, wire types, examples |
+| **[createos-rust-sdk](https://github.com/NodeOps-app/createos-rust-sdk)** | `../createos-rust-sdk` | Rust SDK | 🌐 public | public SDK methods, wire types, examples |
 | **[createos-cli](https://github.com/nodeops-app/createos-cli)** | `../createos-cli` | Go CLI (`createos`) | 🌐 public | commands, flags, help/UX text |
 | **[createos-v2-landing](https://github.com/NodeOps-app/createos-v2-landing)** | `../createos-v2-landing` | public docs — `apps/docs/src/pages/Sandbox/` | 🌐 public | REST / SDK / CLI reference, concept and integration pages |
 | **[createos-plugin](https://github.com/NodeOps-app/createos-plugin)** | `../createos-plugin` | integrations monorepo — plugins for 8 agent hosts | 🌐 public | skills, slash commands, hooks, tools |
@@ -42,7 +45,7 @@ HTTP endpoint or method · wire or JSON field · error shape · sandbox lifecycl
 
 ### Ripple order
 
-`fc` (`openapi.yaml`) → the three SDKs → `createos-cli` → examples → public docs → integrations
+`fc` (`openapi.yaml`) → the six SDKs → `createos-cli` → examples → public docs → integrations
 
 ### Frozen — do not update
 

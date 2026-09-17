@@ -53,6 +53,64 @@ def test_health_omits_auth_and_whoami_sends_it():
     assert seen[1].headers["x-api-key"] == "secret"
 
 
+def test_injected_client_credentials_are_removed():
+    seen = []
+
+    def handler(request):
+        seen.append(request)
+        if request.url.path == "/healthz":
+            return envelope({"up": True})
+        return envelope({"user_id": "user-1", "stats": {"total": 1}})
+
+    supplied = httpx.Client(
+        transport=httpx.MockTransport(handler),
+        headers={
+            "X-Api-Key": "injected",
+            "Authorization": "Bearer injected",
+            "Cookie": "session=injected",
+            "X-CSRF-Token": "injected",
+        },
+        auth=httpx.BasicAuth("injected", "secret"),
+    )
+    client = Client(
+        api_key="sdk-key",
+        base_url="https://example.test",
+        http_client=supplied,
+    )
+
+    assert client.health().up is True
+    assert client.who_am_i().user_id == "user-1"
+    for request in seen:
+        assert "authorization" not in request.headers
+        assert "cookie" not in request.headers
+        assert "x-csrf-token" not in request.headers
+    assert "x-api-key" not in seen[0].headers
+    assert seen[1].headers["x-api-key"] == "sdk-key"
+
+
+def test_error_body_is_read_only_up_to_limit():
+    class CountingStream(httpx.SyncByteStream):
+        chunks = 0
+
+        def __iter__(self):
+            for _ in range(8):
+                self.chunks += 1
+                yield b"x" * (1 << 20)
+
+    source = CountingStream()
+    supplied = mock_client(lambda _: httpx.Response(404, stream=source))
+    client = Client(
+        api_key="sdk-key",
+        base_url="https://example.test",
+        http_client=supplied,
+    )
+
+    with pytest.raises(APIError) as caught:
+        client.get_sandbox("missing")
+    assert len(caught.value.body) == 4 << 20
+    assert source.chunks <= 4
+
+
 def test_client_uses_createos_api_key_environment_variable(monkeypatch):
     seen = []
 

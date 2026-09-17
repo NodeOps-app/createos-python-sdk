@@ -104,6 +104,7 @@ class Client:
         try:
             if response.status_code not in {200, 503}:
                 self._transport._raise_for_status(response, "GET", path)
+            response.read()
             try:
                 envelope = response.json()
                 data = envelope.get("data")

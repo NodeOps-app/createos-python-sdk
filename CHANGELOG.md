@@ -17,6 +17,11 @@ Versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- Remove credentials inherited from supplied HTTP clients on public requests.
+- Bound error-response inspection to 4 MiB before buffering the response.
+
 ## [0.1.2] — 2026-09-16
 
 ### Changed

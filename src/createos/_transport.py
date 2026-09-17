@@ -162,6 +162,12 @@ class Transport:
                     json=json_body,
                     content=content,
                 )
+                # A supplied httpx.Client can contribute default credentials
+                # after the per-request headers above have been filtered.
+                for name in _SENSITIVE:
+                    request.headers.pop(name, None)
+                if not skip_auth:
+                    request.headers["X-Api-Key"] = self.api_key
                 request_timeout = (
                     options.timeout
                     if options.timeout is not None
@@ -174,7 +180,7 @@ class Transport:
                     "pool": request_timeout,
                 }
                 response = self.client.send(
-                    request, stream=stream, follow_redirects=False
+                    request, stream=True, auth=None, follow_redirects=False
                 )
             except (httpx.TransportError, httpx.TimeoutException):
                 if attempt >= attempts or not _idempotent(method):
@@ -197,6 +203,12 @@ class Transport:
             if attempt >= attempts or not _retryable(
                 method, response.status_code
             ):
+                if not stream and 200 <= response.status_code < 300:
+                    try:
+                        response.read()
+                    except Exception:
+                        response.close()
+                        raise
                 return response
             delay = _retry_after(response.headers.get("retry-after"))
             response.close()
@@ -222,16 +234,21 @@ class Transport:
     ) -> None:
         if 200 <= response.status_code < 300:
             return
-        body = response.read()[: 4 << 20]
-        error = APIError(
-            status_code=response.status_code,
-            method=method,
-            endpoint=path,
-            body=body,
-            headers=response.headers,
-        )
-        response.close()
-        raise error
+        try:
+            body = bytearray()
+            for chunk in response.iter_bytes(chunk_size=64 << 10):
+                body.extend(chunk[: (4 << 20) - len(body)])
+                if len(body) == 4 << 20:
+                    break
+            raise APIError(
+                status_code=response.status_code,
+                method=method,
+                endpoint=path,
+                body=bytes(body),
+                headers=response.headers,
+            )
+        finally:
+            response.close()
 
 
 _SENSITIVE = {
@@ -241,6 +258,7 @@ _SENSITIVE = {
     "x-auth-token",
     "cookie",
     "set-cookie",
+    "x-csrf-token",
 }
 
 
