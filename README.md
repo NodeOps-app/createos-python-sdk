@@ -44,16 +44,22 @@ Python says hello from x86_64
 ```
 
 Do not commit a real API key to source control; inject it through your
-application's secret manager. You can configure the endpoint and default
-request timeout when constructing the client:
+application's secret manager. You can configure the endpoint, default request
+timeout, and retry policy when constructing the client:
 
 ```python
+from createos import Client, RetryOptions
+
+
 client = Client(
     api_key=api_key,
     base_url="http://localhost:8080",
     timeout=30,
+    retry=RetryOptions(max_retries=3, base_delay=0.25, max_delay=10),
 )
 ```
+
+Timeout and retry delays are in seconds.
 
 As an alternative, `Client()` reads `CREATEOS_API_KEY` and
 `CREATEOS_SANDBOX_BASE_URL`. Explicit constructor arguments take precedence.
