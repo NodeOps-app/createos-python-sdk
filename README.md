@@ -81,6 +81,7 @@ As an alternative, `Client()` reads `CREATEOS_API_KEY` and
 
 - [TypeScript](https://github.com/NodeOps-app/createos-sandbox-sdk)
 - [Go](https://github.com/NodeOps-app/createos-go-sdk)
+- [Python](https://github.com/NodeOps-app/createos-python-sdk)
 - [C#](https://github.com/NodeOps-app/createos-csharp-sdk)
 - [Java](https://github.com/NodeOps-app/createos-java-sdk)
 - [Rust](https://github.com/NodeOps-app/createos-rust-sdk)
@@ -292,6 +293,19 @@ sandbox.destroy()
 The `SandboxInstance` handle safely caches the latest server projection.
 Lifecycle mutations and `refresh()` update it, while `id`, `name`, `status`,
 `ip_address`, and `data` provide safe reads.
+
+## Build reusable templates
+
+Build a sandbox root filesystem from a Dockerfile, follow its build logs, and
+wait until the template is ready before creating a sandbox from its ID. See the
+[custom template example](examples/custom_template/README.md) for the complete
+workflow and cleanup.
+
+## Automate a desktop
+
+The desktop root filesystem supports screenshots, mouse and keyboard control,
+clipboard access, and temporary noVNC connections. The
+[desktop example](examples/desktop/README.md) exercises these operations.
 
 ## Errors stay inspectable
 
