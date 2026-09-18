@@ -82,6 +82,8 @@ def test_sandbox_access_token_lifecycle_and_scoped_credential():
     sandbox = client.get_sandbox("sb-1")
     created = sandbox.create_access_token()
     assert created.token == "skp_sb_first" and created.created_at.year == 2026
+    assert created.token not in repr(created)
+    assert "enabled=True" in repr(created)
     assert sandbox.get_access_token().token_hint == "skp_sb...irst"
     worker = sandbox.with_access_token(created.token)
     assert worker is not sandbox and worker.files is not sandbox.files

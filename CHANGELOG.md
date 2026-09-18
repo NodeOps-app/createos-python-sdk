@@ -17,6 +17,11 @@ Versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- Redact plaintext sandbox access tokens from response representations to
+  prevent accidental disclosure in logs.
+
 ### Changed
 
 - Set the next package version to `0.1.3` on the patch release line.
