@@ -33,6 +33,78 @@ def mock_client(handler):
     return httpx.Client(transport=httpx.MockTransport(handler))
 
 
+def test_sandbox_access_token_lifecycle_and_scoped_credential():
+    seen = []
+    responses = [
+        envelope({"id": "sb-1", "status": "running"}),
+        envelope(
+            {
+                "token": "skp_sb_first",
+                "enabled": True,
+                "created_at": "2026-09-18T10:00:00Z",
+            }
+        ),
+        envelope(
+            {
+                "enabled": True,
+                "token_hint": "skp_sb...irst",
+                "created_at": "2026-09-18T10:00:00Z",
+            }
+        ),
+        envelope(
+            {
+                "result": {"stdout": "hello\n", "stderr": "", "exit_code": 0},
+                "exec_ms": 1,
+            }
+        ),
+        envelope(
+            {
+                "token": "skp_sb_second",
+                "enabled": True,
+                "created_at": "2026-09-18T10:00:00Z",
+                "rotated_at": "2026-09-18T11:00:00Z",
+            }
+        ),
+        envelope({"enabled": False}),
+    ]
+
+    def handler(request):
+        seen.append(
+            (request.method, request.url.path, request.headers["x-api-key"])
+        )
+        return responses.pop(0)
+
+    client = Client(
+        api_key="owner",
+        base_url="https://example.test",
+        http_client=mock_client(handler),
+    )
+    sandbox = client.get_sandbox("sb-1")
+    created = sandbox.create_access_token()
+    assert created.token == "skp_sb_first" and created.created_at.year == 2026
+    assert sandbox.get_access_token().token_hint == "skp_sb...irst"
+    worker = sandbox.with_access_token(created.token)
+    assert worker is not sandbox and worker.files is not sandbox.files
+    assert (
+        worker.run_command(
+            RunCommandRequest(command="echo", arguments=["hello"])
+        ).result.standard_output
+        == "hello\n"
+    )
+    assert sandbox.rotate_access_token().rotated_at.hour == 11
+    assert sandbox.disable_access_token().enabled is False
+    assert seen == [
+        ("GET", "/v1/sandboxes/sb-1", "owner"),
+        ("POST", "/v1/sandboxes/sb-1/access-token", "owner"),
+        ("GET", "/v1/sandboxes/sb-1/access-token", "owner"),
+        ("POST", "/v1/sandboxes/sb-1/exec", "skp_sb_first"),
+        ("POST", "/v1/sandboxes/sb-1/access-token/rotate", "owner"),
+        ("DELETE", "/v1/sandboxes/sb-1/access-token", "owner"),
+    ]
+    with pytest.raises(ValueError):
+        sandbox.with_access_token("  ")
+
+
 def test_health_omits_auth_and_whoami_sends_it():
     seen = []
 

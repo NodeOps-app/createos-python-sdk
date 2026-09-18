@@ -67,6 +67,17 @@ class Transport:
         if self._owns_client:
             self.client.close()
 
+    def with_api_key(self, api_key: str) -> Transport:
+        """Share connection settings with a separate credential."""
+        return Transport(
+            base_url=self.base_url,
+            api_key=api_key,
+            timeout=self.timeout,
+            user_agent=self.user_agent,
+            retry=self.retry,
+            http_client=self.client,
+        )
+
     def request(
         self,
         method: str,
