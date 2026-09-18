@@ -17,6 +17,10 @@ Versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- Set the next package version to `0.1.3` on the patch release line.
+
 ### Added
 
 - Sandbox access token creation, inspection, rotation, disabling, and a
