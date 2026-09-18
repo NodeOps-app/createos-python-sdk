@@ -89,6 +89,8 @@ from .models import (
     RunCommandRequest,
     RunCommandResponse,
     Sandbox,
+    SandboxAccessTokenCreateResponse,
+    SandboxAccessTokenMetadata,
     SandboxDisk,
     SandboxStatus,
     Shape,

@@ -24,6 +24,8 @@ from .models import (
     RunCommandRequest,
     RunCommandResponse,
     Sandbox,
+    SandboxAccessTokenCreateResponse,
+    SandboxAccessTokenMetadata,
     SandboxDisk,
     SandboxStatus,
     WaitOptions,
@@ -84,6 +86,43 @@ class SandboxInstance:
 
     def _path(self, suffix: str) -> str:
         return f"/v1/sandboxes/{quote(self.id, safe='')}{suffix}"
+
+    def with_access_token(self, token: str) -> SandboxInstance:
+        """Return a separate handle using a delegated sandbox token."""
+        token = token.strip()
+        if not token:
+            raise ValueError("sandbox access token must not be empty")
+        return SandboxInstance(
+            self._transport.with_api_key(token), self._snapshot()
+        )
+
+    def create_access_token(self) -> SandboxAccessTokenCreateResponse:
+        """Create a token; its plaintext value is returned only once."""
+        return _one(
+            SandboxAccessTokenCreateResponse,
+            self._transport.request("POST", self._path("/access-token")),
+        )
+
+    def get_access_token(self) -> SandboxAccessTokenMetadata:
+        """Read token state and its redacted hint."""
+        return _one(
+            SandboxAccessTokenMetadata,
+            self._transport.request("GET", self._path("/access-token")),
+        )
+
+    def rotate_access_token(self) -> SandboxAccessTokenCreateResponse:
+        """Replace an existing token and return its new plaintext value."""
+        return _one(
+            SandboxAccessTokenCreateResponse,
+            self._transport.request("POST", self._path("/access-token/rotate")),
+        )
+
+    def disable_access_token(self) -> SandboxAccessTokenMetadata:
+        """Revoke the current token, if present."""
+        return _one(
+            SandboxAccessTokenMetadata,
+            self._transport.request("DELETE", self._path("/access-token")),
+        )
 
     def refresh(self) -> SandboxInstance:
         """Reload the server projection and return this handle."""

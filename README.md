@@ -64,6 +64,31 @@ Timeout and retry delays are in seconds.
 As an alternative, `Client()` reads `CREATEOS_API_KEY` and
 `CREATEOS_SANDBOX_BASE_URL`. Explicit constructor arguments take precedence.
 
+## Delegate access to one sandbox
+
+The owner can create one token for a sandbox. Creation and rotation return the
+plaintext token once; inspection returns only a redacted hint.
+
+```python
+created = sandbox.create_access_token()
+worker = sandbox.with_access_token(created.token)
+result = worker.run_command(RunCommandRequest(command="echo", arguments=["hello"]))
+print(result.result.standard_output)
+
+metadata = sandbox.get_access_token()
+print(metadata.token_hint)
+replacement = sandbox.rotate_access_token()
+# Give replacement.token to the worker instead of the old token.
+sandbox.disable_access_token()
+```
+
+Use the owner's handle to manage tokens. A delegated handle can operate its
+bound sandbox, including commands, files, processes, computer use, pause,
+resume, and destroy; it cannot manage tokens or account resources. Creating
+another enabled token returns HTTP 409; rotation requires an existing token.
+Disabling is idempotent. Revocation is immediate in the home region and
+propagates asynchronously to other regions.
+
 ## Documentation
 
 - [CreateOS Sandbox overview](https://createos.sh/docs/Sandbox/Overview)

@@ -17,6 +17,11 @@ Versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- Sandbox access token creation, inspection, rotation, disabling, and a
+  separate delegated credential handle.
+
 ### Fixed
 
 - Remove credentials inherited from supplied HTTP clients on public requests.

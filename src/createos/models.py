@@ -589,6 +589,26 @@ class Sandbox(Model):
 
 
 @dataclass(slots=True)
+class SandboxAccessTokenCreateResponse(Model):
+    """Plaintext delegated token returned only on creation or rotation."""
+
+    token: str
+    enabled: bool
+    created_at: datetime
+    rotated_at: datetime | None = None
+
+
+@dataclass(slots=True)
+class SandboxAccessTokenMetadata(Model):
+    """Token state without the plaintext credential."""
+
+    enabled: bool
+    token_hint: str | None = None
+    created_at: datetime | None = None
+    rotated_at: datetime | None = None
+
+
+@dataclass(slots=True)
 class CommandResult(Model):
     standard_output: str = _json("stdout", default="")
     standard_error: str = _json("stderr", default="")
