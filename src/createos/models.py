@@ -592,7 +592,7 @@ class Sandbox(Model):
 class SandboxAccessTokenCreateResponse(Model):
     """Plaintext delegated token returned only on creation or rotation."""
 
-    token: str
+    token: str = field(repr=False)
     enabled: bool
     created_at: datetime
     rotated_at: datetime | None = None
