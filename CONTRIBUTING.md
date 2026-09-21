@@ -56,14 +56,19 @@ and update public docstrings and README examples when the public API changes.
 
 ## Releasing
 
-The package is published manually to PyPI as `createos-sandbox`.
+The package `createos-sandbox` is published to PyPI by CI. Pushing a
+`v<version>` tag runs `.github/workflows/ci.yml`, which builds the sdist and
+wheel and uploads them via PyPI Trusted Publishing (OIDC — no token stored
+anywhere).
 
 1. Bump `__version__` in `src/createos/_version.py` (the single source of
    truth — `pyproject.toml` reads it) and move the `CHANGELOG.md`
    `[Unreleased]` entries under the new version.
 2. Dry run the release gate: `./scripts/publish.sh --dry`.
-3. Publish: `./scripts/publish.sh`. It reruns tests, lint, types, builds the
-   sdist and wheel, uploads with `twine`, then tags and pushes `v<version>`.
+3. Release: `./scripts/publish.sh`. It reruns tests, lint, types, builds and
+   checks the sdist/wheel, then tags and pushes `v<version>` — CI takes it
+   from there.
 
-Uploading needs a PyPI API token, e.g. in `~/.pypirc` or as
-`TWINE_USERNAME=__token__ TWINE_PASSWORD=pypi-...`.
+One-time setup: on PyPI, add this repo as a trusted publisher for
+`createos-sandbox` (Your projects → createos-sandbox → Publishing → Add a
+new publisher), with workflow name `ci.yml` and environment name `pypi`.

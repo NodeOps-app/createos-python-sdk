@@ -3,6 +3,7 @@ name: CI
 on:
   push:
     branches: [main]
+    tags: ["v*"]
   pull_request:
   workflow_dispatch:
 
@@ -72,11 +73,43 @@ jobs:
           python-version: "3.14"
           cache: pip
           cache-dependency-path: pyproject.toml
-      - name: Install build frontend
-        run: python -m pip install build
+      - name: Install package and development tools
+        run: python -m pip install -e '.[dev]'
       - name: Build source and wheel distributions
         run: python -m build
+      - name: Check distributions
+        run: python -m twine check --strict dist/*
       - name: Install and import the built wheel
         run: |
           python -m pip install --force-reinstall dist/*.whl
           python -c "import createos; print(createos.__version__)"
+      - if: startsWith(github.ref, 'refs/tags/')
+        name: Verify tag matches package version
+        run: |
+          version=$(python -c "import re,pathlib;print(re.search(r'\"(.+)\"',pathlib.Path('src/createos/_version.py').read_text()).group(1))")
+          tag="${GITHUB_REF_NAME#v}"
+          if [ "$version" != "$tag" ]; then
+            echo "tag v$tag does not match _version.py ($version)" >&2
+            exit 1
+          fi
+      - if: startsWith(github.ref, 'refs/tags/')
+        uses: actions/upload-artifact@v7
+        with:
+          name: dist
+          path: dist/
+
+  publish:
+    name: Publish to PyPI
+    needs: [test, quality, package]
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: dist
+          path: dist/
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@a892a5a61159132606e93a2fa6f4358831b04d26 # v1.14.2
