@@ -72,6 +72,7 @@ from createos import CreateSandboxRequest, ListSandboxesOptions
 sandbox = client.create_sandbox(
     CreateSandboxRequest(
         shape="s-1vcpu-1gb",
+        rootfs="alpine:3.20",
         labels={"team": "backend", "environment": "test"},
     )
 )
