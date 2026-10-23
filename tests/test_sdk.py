@@ -13,10 +13,13 @@ from createos import (
     CreateSandboxRequest,
     ExecStreamEventType,
     ForkSandboxRequest,
+    ListSandboxesOptions,
     ManagedProcessConnectEvent,
     ProtocolError,
     RequestOptions,
     RunCommandRequest,
+    Sandbox,
+    SandboxInstance,
     SandboxStatus,
 )
 
@@ -218,6 +221,7 @@ def test_create_initializes_state_services_and_clear_wire_fields():
                 "id": "sb-1",
                 "status": "paused",
                 "name": "demo",
+                "labels": {"team": "backend"},
                 "ip": "10.0.0.2",
                 "shape": "s-4vcpu-4gb",
                 "mem_mib": 4096,
@@ -233,12 +237,17 @@ def test_create_initializes_state_services_and_clear_wire_fields():
     )
     sandbox = client.create_sandbox(
         CreateSandboxRequest(
-            shape="s-4vcpu-4gb", name="demo", ingress_enabled=True
+            shape="s-4vcpu-4gb",
+            name="demo",
+            labels={"team": "backend"},
+            ingress_enabled=True,
         )
     )
     assert requests[0].url.path == "/api/v1/sandboxes"
+    assert json.loads(requests[0].content)["labels"] == {"team": "backend"}
     assert sandbox.id == "sb-1"
     assert sandbox.status is SandboxStatus.PAUSED
+    assert sandbox.data.labels == {"team": "backend"}
     assert sandbox.files and sandbox.processes and sandbox.computer.mouse
     assert sandbox.preview_url(8080) == "https://8080-sb-1.example.test"
 
@@ -339,6 +348,10 @@ def test_list_sandboxes_walks_pages():
     offsets = []
 
     def handler(request):
+        assert (
+            request.url.params["labels"]
+            == '{"environment":"test","team":"backend"}'
+        )
         offset = int(request.url.params["offset"])
         offsets.append(offset)
         rows = [
@@ -361,9 +374,40 @@ def test_list_sandboxes_walks_pages():
         base_url="https://example.test",
         http_client=mock_client(handler),
     )
-    sandboxes = client.list_sandboxes()
+    sandboxes = client.list_sandboxes(
+        ListSandboxesOptions(labels={"team": "backend", "environment": "test"})
+    )
     assert [item.id for item in sandboxes] == ["sb-0", "sb-1", "sb-2"]
     assert offsets == [0, 2]
+
+
+def test_set_labels_patches_and_updates_state():
+    def handler(request):
+        assert request.method == "PATCH"
+        assert json.loads(request.content) == {"labels": {"team": "platform"}}
+        return envelope(
+            {
+                "id": "sb-1",
+                "status": "running",
+                "labels": {"environment": "test", "team": "platform"},
+            }
+        )
+
+    client = Client(
+        api_key="key",
+        base_url="https://example.test",
+        http_client=mock_client(handler),
+    )
+    sandbox = SandboxInstance(
+        client._transport,
+        Sandbox(id="sb-1", status=SandboxStatus.RUNNING),
+    )
+
+    sandbox.set_labels({"team": "platform"})
+    assert sandbox.data.labels == {
+        "environment": "test",
+        "team": "platform",
+    }
 
 
 def test_command_stream_projects_frames_and_accepts_sse():

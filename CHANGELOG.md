@@ -17,6 +17,11 @@ Versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- Sandbox labels on create and response models, AND-matched label filtering in
+  `list_sandboxes()`, and label merging through `SandboxInstance.set_labels()`.
+
 ### Fixed
 
 - Redact plaintext sandbox access tokens from response representations to

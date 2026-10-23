@@ -238,6 +238,9 @@ class CreateSandboxRequest(Model):
     shape: str = ""
     rootfs: str = _json("rootfs", omit_default=True, default="")
     name: str = _json("name", omit_default=True, default="")
+    labels: dict[str, str] = _json(
+        "labels", omit_default=True, default_factory=dict
+    )
     networks: list[NetworkEntry] = _json(
         "networks", omit_default=True, default_factory=list
     )
@@ -430,6 +433,7 @@ class RequestOptions:
 class ListSandboxesOptions(RequestOptions):
     limit: int = 0
     status: SandboxStatus | None = None
+    labels: dict[str, str] = field(default_factory=dict)
 
 
 @dataclass(slots=True)
@@ -547,6 +551,7 @@ class CreateSandboxResponse(Model):
     id: str
     status: SandboxStatus
     name: str | None = None
+    labels: dict[str, str] = field(default_factory=dict)
     ip_address: str = _json("ip", default="")
     shape: str = ""
     rootfs: str | None = None
@@ -571,6 +576,7 @@ class Sandbox(Model):
     ingress_enabled: bool = False
     ingress_url_template: str = ""
     name: str | None = None
+    labels: dict[str, str] = field(default_factory=dict)
     running_at: datetime | None = None
     destroyed_at: datetime | None = None
     spawn_milliseconds: float = _json("spawn_ms", default=0.0)
