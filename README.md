@@ -64,6 +64,26 @@ Timeout and retry delays are in seconds.
 As an alternative, `Client()` reads `CREATEOS_API_KEY` and
 `CREATEOS_SANDBOX_BASE_URL`. Explicit constructor arguments take precedence.
 
+## Organize sandboxes with labels
+
+```python
+from createos import CreateSandboxRequest, ListSandboxesOptions
+
+sandbox = client.create_sandbox(
+    CreateSandboxRequest(
+        shape="s-1vcpu-1gb",
+        labels={"team": "backend", "environment": "test"},
+    )
+)
+matches = client.list_sandboxes(
+    ListSandboxesOptions(labels={"team": "backend"})
+)
+sandbox.set_labels({"environment": "production"})
+```
+
+List filters use AND semantics. `set_labels()` merges the supplied keys into
+the existing label map.
+
 ## Delegate access to one sandbox
 
 The owner can create one token for a sandbox. Creation and rotation return the

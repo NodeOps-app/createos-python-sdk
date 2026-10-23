@@ -181,6 +181,14 @@ class SandboxInstance:
         self._update(_one(Sandbox, data))
         return self
 
+    def set_labels(self, labels: dict[str, str]) -> SandboxInstance:
+        """Merge labels into the sandbox's existing labels."""
+        data = self._transport.request(
+            "PATCH", self._path(""), body={"labels": labels}
+        )
+        self._update(_one(Sandbox, data))
+        return self
+
     def set_auto_pause(self, timeout: float | None) -> SandboxInstance:
         """Set the idle timeout in seconds, or disable it with ``None``."""
         body: dict[str, bool | int]

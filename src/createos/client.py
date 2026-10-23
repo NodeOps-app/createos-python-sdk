@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import os
 from urllib.parse import quote
 
@@ -142,6 +143,7 @@ class Client:
             ingress_enabled=request.ingress_enabled,
             ingress_url_template=created.ingress_url_template,
             name=created.name,
+            labels=created.labels,
             spawn_milliseconds=created.spawn_milliseconds,
             shape=created.shape,
             rootfs=created.rootfs,
@@ -169,6 +171,10 @@ class Client:
         """Return sandbox handles visible to the caller."""
         options = options or ListSandboxesOptions()
         params = {"status": str(options.status)} if options.status else {}
+        if options.labels:
+            params["labels"] = json.dumps(
+                options.labels, separators=(",", ":"), sort_keys=True
+            )
         items: list[Sandbox] = []
         offset = 0
         while options.limit <= 0 or len(items) < options.limit:
