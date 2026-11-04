@@ -85,6 +85,21 @@ sandbox.set_labels({"environment": "production"})
 List filters use AND semantics. `set_labels()` merges the supplied keys into
 the existing label map.
 
+## Capture and restore snapshots
+
+```python
+snapshot = sandbox.create_snapshot(
+    CreateSnapshotRequest(type=SnapshotType.DISK, name="configured-workspace")
+)
+snapshot = client.snapshots.get(snapshot.id)  # poll until READY
+restored = client.create_sandbox(CreateSandboxRequest(snapshot_id=snapshot.id))
+```
+
+Disk snapshots capture the filesystem. Full snapshots also retain memory and
+must be restored with their captured CPU, memory, and disk sizes. Snapshot
+capture requires a running source sandbox with no attached external disks.
+Each account may retain up to five snapshots across both types.
+
 ## Delegate access to one sandbox
 
 The owner can create one token for a sandbox. Creation and rotation return the
@@ -384,6 +399,7 @@ Runnable examples live under [`examples/`](examples/):
 - [HTTP execution server](examples/execution_server/README.md)
 - [Command streaming](examples/command_streaming/README.md)
 - [Files and snapshots](examples/files_and_snapshots/README.md)
+- [Reusable snapshots](examples/reusable_snapshots/README.md)
 - [Ingress preview](examples/ingress_preview/README.md)
 - [Private overlay network](examples/network/README.md)
 - [Custom template](examples/custom_template/README.md)
@@ -428,7 +444,7 @@ to run before opening a pull request.
 ```text
 src/createos/client.py      client configuration and account-level operations
 src/createos/instance.py    stateful sandbox lifecycle and command operations
-src/createos/services.py    files, processes, desktop, templates, disks, networks
+src/createos/services.py    files, processes, desktop, templates, disks, networks, snapshots
 src/createos/models.py      public requests, responses, options, and enums
 src/createos/_transport.py  HTTP, authentication, retries, and JSend handling
 src/createos/_streams.py    NDJSON, SSE, command, process, and binary streams

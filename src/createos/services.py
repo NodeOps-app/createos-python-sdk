@@ -45,6 +45,8 @@ from .models import (
     PaginationOptions,
     PTYSize,
     RequestOptions,
+    Snapshot,
+    SnapshotDeletedResponse,
     Template,
     TemplateCreateRequest,
     TemplateLogsOptions,
@@ -286,6 +288,41 @@ class DisksService:
             "PATCH", f"/v1/disks/{_segment(disk_id_or_name)}", body=body
         )
         return _one(Disk, data)
+
+
+class SnapshotsService:
+    """Manage account-level reusable sandbox snapshots."""
+
+    def __init__(self, transport: Transport) -> None:
+        self._transport = transport
+
+    def list(self, options: PaginationOptions | None = None) -> list[Snapshot]:
+        """Return reusable snapshots owned by the caller."""
+        return _fetch_all(
+            self._transport,
+            "/v1/snapshots",
+            Snapshot,
+            options or PaginationOptions(),
+            legacy_key="snapshots",
+        )
+
+    def get(self, snapshot_id: str) -> Snapshot:
+        """Return an owned reusable snapshot by ID."""
+        return _one(
+            Snapshot,
+            self._transport.request(
+                "GET", f"/v1/snapshots/{_segment(snapshot_id)}"
+            ),
+        )
+
+    def delete(self, snapshot_id: str) -> SnapshotDeletedResponse:
+        """Remove an owned ready or failed snapshot from API listings."""
+        return _one(
+            SnapshotDeletedResponse,
+            self._transport.request(
+                "DELETE", f"/v1/snapshots/{_segment(snapshot_id)}"
+            ),
+        )
 
 
 class FilesService:

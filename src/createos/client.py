@@ -29,6 +29,7 @@ from .models import (
 from .services import (
     DisksService,
     NetworksService,
+    SnapshotsService,
     TemplatesService,
     _fetch_all,
     _many,
@@ -69,6 +70,7 @@ class Client:
         self.templates = TemplatesService(self._transport)
         self.networks = NetworksService(self._transport)
         self.disks = DisksService(self._transport)
+        self.snapshots = SnapshotsService(self._transport)
 
     @property
     def base_url(self) -> str:
@@ -134,6 +136,7 @@ class Client:
         )
         created = _one(CreateSandboxResponse, data)
         sandbox = Sandbox(
+            snapshot_id=created.snapshot_id,
             id=created.id,
             status=created.status,
             ip_address=created.ip_address,

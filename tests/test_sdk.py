@@ -11,6 +11,7 @@ from createos import (
     Client,
     CommandStreamEvent,
     CreateSandboxRequest,
+    CreateSnapshotRequest,
     ExecStreamEventType,
     ForkSandboxRequest,
     ListSandboxesOptions,
@@ -21,6 +22,8 @@ from createos import (
     Sandbox,
     SandboxInstance,
     SandboxStatus,
+    SnapshotStatus,
+    SnapshotType,
 )
 
 
@@ -408,6 +411,92 @@ def test_set_labels_patches_and_updates_state():
         "environment": "test",
         "team": "platform",
     }
+
+
+def test_snapshot_lifecycle_and_restore():
+    seen = []
+
+    def handler(request):
+        seen.append((request.method, request.url.path))
+        if request.url.path == "/v1/sandboxes/sb-1/snapshots":
+            assert json.loads(request.content) == {
+                "type": "full",
+                "name": "checkpoint",
+            }
+            return envelope(
+                {
+                    "id": "snap-1",
+                    "sandbox_id": "sb-1",
+                    "type": "full",
+                    "status": "creating",
+                    "created_at": "2026-11-03T00:00:00Z",
+                },
+                status_code=202,
+            )
+        if request.url.path == "/v1/snapshots/snap-1":
+            if request.method == "DELETE":
+                return envelope(
+                    {"id": "snap-1", "status": "deleting"},
+                    status_code=202,
+                )
+            return envelope(
+                {
+                    "id": "snap-1",
+                    "sandbox_id": "sb-1",
+                    "type": "full",
+                    "status": "ready",
+                }
+            )
+        if request.url.path == "/v1/snapshots":
+            return envelope(
+                {
+                    "data": [
+                        {
+                            "id": "snap-1",
+                            "sandbox_id": "sb-1",
+                            "type": "full",
+                            "status": "ready",
+                        }
+                    ],
+                    "pagination": {"total": 1},
+                }
+            )
+        assert json.loads(request.content) == {"snapshot_id": "snap-1"}
+        return envelope(
+            {
+                "id": "sb-2",
+                "snapshot_id": "snap-1",
+                "status": "running",
+            }
+        )
+
+    client = Client(
+        api_key="key",
+        base_url="https://example.test",
+        http_client=mock_client(handler),
+    )
+    source = SandboxInstance(
+        client._transport,
+        Sandbox(id="sb-1", status=SandboxStatus.RUNNING),
+    )
+    snapshot = source.create_snapshot(
+        CreateSnapshotRequest(type=SnapshotType.FULL, name="checkpoint")
+    )
+    assert snapshot.status is SnapshotStatus.CREATING
+    assert client.snapshots.get(snapshot.id).status is SnapshotStatus.READY
+    assert [item.id for item in client.snapshots.list()] == ["snap-1"]
+    restored = client.create_sandbox(CreateSandboxRequest(snapshot_id="snap-1"))
+    assert restored.data.snapshot_id == "snap-1"
+    assert (
+        client.snapshots.delete(snapshot.id).status is SnapshotStatus.DELETING
+    )
+    assert seen == [
+        ("POST", "/v1/sandboxes/sb-1/snapshots"),
+        ("GET", "/v1/snapshots/snap-1"),
+        ("GET", "/v1/snapshots"),
+        ("POST", "/v1/sandboxes"),
+        ("DELETE", "/v1/snapshots/snap-1"),
+    ]
 
 
 def test_command_stream_projects_frames_and_accepts_sse():
