@@ -33,6 +33,18 @@ class SandboxStatus(StrEnum):
     FAILED = "failed"
 
 
+class SnapshotType(StrEnum):
+    DISK = "disk"
+    FULL = "full"
+
+
+class SnapshotStatus(StrEnum):
+    CREATING = "creating"
+    READY = "ready"
+    FAILED = "failed"
+    DELETING = "deleting"
+
+
 class ExecStreamEventType(StrEnum):
     STDOUT = "stdout"
     STDERR = "stderr"
@@ -235,7 +247,8 @@ class DiskAttachment(Model):
 
 @dataclass(slots=True)
 class CreateSandboxRequest(Model):
-    shape: str = ""
+    snapshot_id: str = _json("snapshot_id", omit_default=True, default="")
+    shape: str = _json("shape", omit_default=True, default="")
     rootfs: str = _json("rootfs", omit_default=True, default="")
     name: str = _json("name", omit_default=True, default="")
     labels: dict[str, str] = _json(
@@ -268,6 +281,12 @@ class CreateSandboxRequest(Model):
     auto_pause_after_seconds: int = _json(
         "auto_pause_after_seconds", omit_default=True, default=0
     )
+
+
+@dataclass(slots=True)
+class CreateSnapshotRequest(Model):
+    type: SnapshotType = SnapshotType.DISK
+    name: str = _json("name", omit_default=True, default="")
 
 
 @dataclass(slots=True)
@@ -562,6 +581,7 @@ class CreateSandboxResponse(Model):
     egress_rules: list[str] = _json("egress", default_factory=list)
     bandwidth_quota_bytes: int = 0
     ingress_url_template: str = ""
+    snapshot_id: str | None = None
 
 
 @dataclass(slots=True)
@@ -592,6 +612,29 @@ class Sandbox(Model):
     last_resumed_at: datetime | None = None
     forked_from: str | None = None
     auto_pause_after_seconds: int | None = None
+    snapshot_id: str | None = None
+
+
+@dataclass(slots=True)
+class Snapshot(Model):
+    id: str
+    sandbox_id: str
+    type: SnapshotType
+    status: SnapshotStatus
+    name: str | None = None
+    created_at: datetime | None = None
+    ready_at: datetime | None = None
+    shape: str = ""
+    vcpu: int = 0
+    memory_mib: int = _json("mem_mib", default=0)
+    disk_mib: int = _json("disk_mib", default=0)
+    size_bytes: int = 0
+
+
+@dataclass(slots=True)
+class SnapshotDeletedResponse(Model):
+    id: str
+    status: SnapshotStatus
 
 
 @dataclass(slots=True)

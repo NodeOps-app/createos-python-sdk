@@ -19,6 +19,8 @@ Versions follow [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- Reusable disk and full snapshot create, get, list, and delete operations,
+  plus sandbox restoration through `CreateSandboxRequest.snapshot_id`.
 - Sandbox labels on create and response models, AND-matched label filtering in
   `list_sandboxes()`, and label merging through `SandboxInstance.set_labels()`.
 

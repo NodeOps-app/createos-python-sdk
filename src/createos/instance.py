@@ -13,6 +13,7 @@ from .errors import CommandError, OperationTimeout
 from .models import (
     AttachDiskOptions,
     BandwidthView,
+    CreateSnapshotRequest,
     DestroyedResponse,
     DetachDiskOptions,
     DiskAttachment,
@@ -28,6 +29,7 @@ from .models import (
     SandboxAccessTokenMetadata,
     SandboxDisk,
     SandboxStatus,
+    Snapshot,
     WaitOptions,
 )
 from .services import (
@@ -144,6 +146,15 @@ class SandboxInstance:
     def resume(self) -> SandboxInstance:
         """Restore the paused sandbox."""
         return self._lifecycle("/resume")
+
+    def create_snapshot(self, request: CreateSnapshotRequest) -> Snapshot:
+        """Start a reusable snapshot capture from this running sandbox."""
+        return _one(
+            Snapshot,
+            self._transport.request(
+                "POST", self._path("/snapshots"), body=request
+            ),
+        )
 
     def fork(
         self, request: ForkSandboxRequest | None = None
