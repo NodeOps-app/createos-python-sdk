@@ -14,6 +14,8 @@ from .instance import Instance, SandboxInstance
 from .models import (
     AttachDiskOptions,
     BandwidthView,
+    Checkpoint,
+    CheckpointRestoreResponse,
     CommandResult,
     CommandStreamEvent,
     ComputerButtonRequest,
@@ -39,6 +41,7 @@ from .models import (
     ComputerWindowGeometry,
     ComputerWindowMoveRequest,
     ComputerWindowResizeRequest,
+    CreateCheckpointRequest,
     CreateSandboxRequest,
     CreateSandboxResponse,
     CreateSnapshotRequest,

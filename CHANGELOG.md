@@ -21,6 +21,8 @@ Versions follow [Semantic Versioning](https://semver.org/).
 
 - Reusable disk and full snapshot create, get, list, and delete operations,
   plus sandbox restoration through `CreateSandboxRequest.snapshot_id`.
+- Checkpoint create, list, restore, and delete operations scoped to
+  a running sandbox through `SandboxInstance.checkpoints`.
 - Sandbox labels on create and response models, AND-matched label filtering in
   `list_sandboxes()`, and label merging through `SandboxInstance.set_labels()`.
 
@@ -31,7 +33,7 @@ Versions follow [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
-- Set the next package version to `0.1.3` on the patch release line.
+- Set the next package version to `0.1.4` on the patch release line.
 
 ### Added
 

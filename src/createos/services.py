@@ -9,6 +9,8 @@ from urllib.parse import quote
 from ._streams import BinaryStream, ProcessStream, TemplateLogStream
 from .errors import ProtocolError
 from .models import (
+    Checkpoint,
+    CheckpointRestoreResponse,
     ComputerButtonRequest,
     ComputerClickRequest,
     ComputerClipboard,
@@ -30,6 +32,7 @@ from .models import (
     ComputerWindowGeometry,
     ComputerWindowMoveRequest,
     ComputerWindowResizeRequest,
+    CreateCheckpointRequest,
     Disk,
     DiskCreateRequest,
     DiskCredentials,
@@ -368,6 +371,46 @@ class FilesService:
             options=_request_options(options or RequestOptions()),
         )
         return BinaryStream(response)
+
+
+class CheckpointsService:
+    """Manage local checkpoints inside one running sandbox."""
+
+    def __init__(self, instance: SandboxInstance) -> None:
+        self._instance = instance
+
+    def _path(self, checkpoint_id: str = "", suffix: str = "") -> str:
+        path = self._instance._path("/checkpoints")
+        if checkpoint_id:
+            path += f"/{_segment(checkpoint_id)}"
+        return path + suffix
+
+    def create(self, request: CreateCheckpointRequest) -> Checkpoint:
+        """Capture an eligible absolute directory."""
+        return _one(
+            Checkpoint,
+            self._instance._transport.request(
+                "POST", self._path(), body=request
+            ),
+        )
+
+    def list(self) -> list[Checkpoint]:
+        """Return checkpoints oldest first."""
+        data = self._instance._transport.request("GET", self._path())
+        return _many(Checkpoint, data)
+
+    def restore(self, checkpoint_id: str) -> CheckpointRestoreResponse:
+        """Restore a checkpoint at its original directory path."""
+        return _one(
+            CheckpointRestoreResponse,
+            self._instance._transport.request(
+                "POST", self._path(checkpoint_id, "/restore")
+            ),
+        )
+
+    def delete(self, checkpoint_id: str) -> None:
+        """Delete a checkpoint record while retaining referenced layers."""
+        self._instance._transport.request("DELETE", self._path(checkpoint_id))
 
 
 class ProcessesService:

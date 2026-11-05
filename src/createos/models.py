@@ -290,6 +290,14 @@ class CreateSnapshotRequest(Model):
 
 
 @dataclass(slots=True)
+class CreateCheckpointRequest(Model):
+    """Select a directory whose local file history should be captured."""
+
+    path: str
+    name: str | None = None
+
+
+@dataclass(slots=True)
 class ForkSandboxRequest(Model):
     start_paused: bool = _json("start_paused", omit_default=True, default=False)
     ssh_public_keys: list[str] | None = _json("ssh_pubkeys", default=None)
@@ -635,6 +643,25 @@ class Snapshot(Model):
 class SnapshotDeletedResponse(Model):
     id: str
     status: SnapshotStatus
+
+
+@dataclass(slots=True)
+class Checkpoint(Model):
+    """Local file history retained inside one sandbox."""
+
+    id: str
+    path: str
+    created_at: datetime
+    name: str | None = None
+    parent_id: str | None = None
+
+
+@dataclass(slots=True)
+class CheckpointRestoreResponse(Model):
+    """Identifies the restored checkpoint and its original directory path."""
+
+    checkpoint_id: str
+    path: str
 
 
 @dataclass(slots=True)
