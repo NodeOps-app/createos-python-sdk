@@ -100,6 +100,28 @@ must be restored with their captured CPU, memory, and disk sizes. Snapshot
 capture requires a running source sandbox with no attached external disks.
 Each account may retain up to five snapshots across both types.
 
+## Checkpoint a directory
+
+Checkpoints keep local file history inside one running sandbox. Stop
+writers before create or restore; processes are not paused automatically.
+
+```python
+from createos import CreateCheckpointRequest
+
+checkpoint = sandbox.checkpoints.create(
+    CreateCheckpointRequest(
+        path="/workspace/project", name="before-update"
+    )
+)
+checkpoints = sandbox.checkpoints.list()
+restored = sandbox.checkpoints.restore(checkpoint.id)
+sandbox.checkpoints.delete(checkpoint.id)
+```
+
+Restore always uses the checkpoint's original path. Checkpoints remain on the
+sandbox disk and disappear with it. See the
+[runnable example](examples/checkpoints/).
+
 ## Delegate access to one sandbox
 
 The owner can create one token for a sandbox. Creation and rotation return the

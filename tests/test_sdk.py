@@ -10,6 +10,7 @@ from createos import (
     AuthenticationError,
     Client,
     CommandStreamEvent,
+    CreateCheckpointRequest,
     CreateSandboxRequest,
     CreateSnapshotRequest,
     ExecStreamEventType,
@@ -558,3 +559,63 @@ def test_file_transfers_use_operation_timeout():
     download_timeout = requests[2].extensions["timeout"]
     assert set(upload_timeout.values()) == {300}
     assert set(download_timeout.values()) == {600}
+
+
+def test_directory_checkpoint_lifecycle_and_encoded_ids():
+    requests = []
+    responses = [
+        envelope({"id": "sb-1", "status": "running"}),
+        envelope(
+            {
+                "id": "cp_first",
+                "path": "/workspace/app",
+                "name": "before-update",
+                "created_at": "2026-11-05T12:00:00Z",
+            }
+        ),
+        envelope(
+            [
+                {
+                    "id": "cp_first",
+                    "path": "/workspace/app",
+                    "created_at": "2026-11-05T12:00:00Z",
+                }
+            ]
+        ),
+        envelope(
+            {
+                "checkpoint_id": "cp_first/segment",
+                "path": "/workspace/app",
+            }
+        ),
+        envelope({}),
+    ]
+
+    def handler(request):
+        requests.append(request)
+        return responses.pop(0)
+
+    client = Client(
+        api_key="key",
+        base_url="https://example.test",
+        http_client=mock_client(handler),
+    )
+    sandbox = client.get_sandbox("sb-1")
+    checkpoint = sandbox.checkpoints.create(
+        CreateCheckpointRequest(path="/workspace/app", name="before-update")
+    )
+    checkpoints = sandbox.checkpoints.list()
+    restored = sandbox.checkpoints.restore("cp_first/segment")
+    sandbox.checkpoints.delete("cp_first/segment")
+
+    assert checkpoint.id == "cp_first" and checkpoint.created_at.year == 2026
+    assert len(checkpoints) == 1
+    assert restored.path == "/workspace/app"
+    assert json.loads(requests[1].content) == {
+        "path": "/workspace/app",
+        "name": "before-update",
+    }
+    assert requests[3].url.raw_path.endswith(
+        b"/checkpoints/cp_first%2Fsegment/restore"
+    )
+    assert requests[4].url.raw_path.endswith(b"/checkpoints/cp_first%2Fsegment")

@@ -33,6 +33,7 @@ from .models import (
     WaitOptions,
 )
 from .services import (
+    CheckpointsService,
     ComputerService,
     FilesService,
     ProcessesService,
@@ -52,6 +53,7 @@ class SandboxInstance:
         self.files = FilesService(self)
         self.processes = ProcessesService(self)
         self.computer = ComputerService(self)
+        self.checkpoints = CheckpointsService(self)
 
     @property
     def id(self) -> str:
