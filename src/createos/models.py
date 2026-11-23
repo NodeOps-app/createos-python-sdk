@@ -254,6 +254,12 @@ class CreateSandboxRequest(Model):
     labels: dict[str, str] = _json(
         "labels", omit_default=True, default_factory=dict
     )
+    timeout_minutes: int = _json(
+        "timeout_minutes", omit_default=True, default=0
+    )
+    sigterm_before_expiry: bool = _json(
+        "sigterm_before_expiry", omit_default=True, default=False
+    )
     networks: list[NetworkEntry] = _json(
         "networks", omit_default=True, default_factory=list
     )
@@ -590,6 +596,8 @@ class CreateSandboxResponse(Model):
     bandwidth_quota_bytes: int = 0
     ingress_url_template: str = ""
     snapshot_id: str | None = None
+    expires_at: datetime | None = None
+    sigterm_before_expiry: bool = False
 
 
 @dataclass(slots=True)
@@ -621,6 +629,8 @@ class Sandbox(Model):
     forked_from: str | None = None
     auto_pause_after_seconds: int | None = None
     snapshot_id: str | None = None
+    expires_at: datetime | None = None
+    sigterm_before_expiry: bool = False
 
 
 @dataclass(slots=True)

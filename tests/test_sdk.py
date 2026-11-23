@@ -226,6 +226,8 @@ def test_create_initializes_state_services_and_clear_wire_fields():
                 "status": "paused",
                 "name": "demo",
                 "labels": {"team": "backend"},
+                "expires_at": "2026-11-23T12:10:00Z",
+                "sigterm_before_expiry": True,
                 "ip": "10.0.0.2",
                 "shape": "s-4vcpu-4gb",
                 "mem_mib": 4096,
@@ -244,14 +246,20 @@ def test_create_initializes_state_services_and_clear_wire_fields():
             shape="s-4vcpu-4gb",
             name="demo",
             labels={"team": "backend"},
+            timeout_minutes=10,
+            sigterm_before_expiry=True,
             ingress_enabled=True,
         )
     )
     assert requests[0].url.path == "/api/v1/sandboxes"
     assert json.loads(requests[0].content)["labels"] == {"team": "backend"}
+    assert json.loads(requests[0].content)["timeout_minutes"] == 10
+    assert json.loads(requests[0].content)["sigterm_before_expiry"] is True
     assert sandbox.id == "sb-1"
     assert sandbox.status is SandboxStatus.PAUSED
     assert sandbox.data.labels == {"team": "backend"}
+    assert sandbox.data.expires_at.isoformat() == "2026-11-23T12:10:00+00:00"
+    assert sandbox.data.sigterm_before_expiry is True
     assert sandbox.files and sandbox.processes and sandbox.computer.mouse
     assert sandbox.preview_url(8080) == "https://8080-sb-1.example.test"
 
