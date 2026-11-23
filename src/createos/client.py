@@ -137,6 +137,8 @@ class Client:
         created = _one(CreateSandboxResponse, data)
         sandbox = Sandbox(
             snapshot_id=created.snapshot_id,
+            expires_at=created.expires_at,
+            sigterm_before_expiry=created.sigterm_before_expiry,
             id=created.id,
             status=created.status,
             ip_address=created.ip_address,

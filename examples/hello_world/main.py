@@ -13,7 +13,13 @@ def main() -> None:
                 name="hello-python",
                 shape="s-4vcpu-4gb",
                 rootfs="devbox:1",
+                timeout_minutes=10,
+                sigterm_before_expiry=True,
             )
+        )
+        print(
+            f"expires_at={sandbox.data.expires_at} "
+            f"sigterm_before_expiry={sandbox.data.sigterm_before_expiry}"
         )
         try:
             response = sandbox.run_command(

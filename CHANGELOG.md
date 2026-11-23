@@ -19,6 +19,8 @@ Versions follow [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- Optional sandbox expiry through `CreateSandboxRequest.timeout_minutes`, with
+  `expires_at` response fields and an optional final-minute SIGTERM warning.
 - Reusable disk and full snapshot create, get, list, and delete operations,
   plus sandbox restoration through `CreateSandboxRequest.snapshot_id`.
 - Checkpoint create, list, restore, and delete operations scoped to

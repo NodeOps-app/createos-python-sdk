@@ -85,6 +85,25 @@ sandbox.set_labels({"environment": "production"})
 List filters use AND semantics. `set_labels()` merges the supplied keys into
 the existing label map.
 
+## Limit sandbox lifetime
+
+```python
+sandbox = client.create_sandbox(
+    CreateSandboxRequest(
+        shape="s-1vcpu-1gb",
+        rootfs="devbox:1",
+        timeout_minutes=10,
+        sigterm_before_expiry=True,
+    )
+)
+print(sandbox.data.expires_at)
+```
+
+`timeout_minutes` accepts 2–1440 whole minutes and starts when the sandbox first
+reaches `running`. Activity and pause/resume do not extend the deadline.
+`sigterm_before_expiry` requests a best-effort warning to managed workloads
+during the final minute and requires `timeout_minutes`.
+
 ## Capture and restore snapshots
 
 ```python
